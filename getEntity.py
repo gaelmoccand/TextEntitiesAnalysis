@@ -13,7 +13,7 @@ import time
 from inspect import getsourcefile
 from os.path import abspath
 
-
+#https://developers.google.com/knowledge-graph
 
 # parsing argument for cmd line arg
 class ArgParser:
@@ -26,7 +26,7 @@ class ArgParser:
         else:
             print("Too few arguments")
             print("Syntax:")
-            print("use .py  \"text\" ")
+            print("use getEntity.py  \"your input\" ")
             self.failed = True
             exit
 
