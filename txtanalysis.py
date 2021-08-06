@@ -27,7 +27,7 @@ class ArgParser:
             exit
 
 
-def sample_analyze_entity_sentiment(text_content):
+def analyze_entity_sentiment(text_content):
     """
     Analyzing Entity Sentiment in a String
 
@@ -39,8 +39,8 @@ def sample_analyze_entity_sentiment(text_content):
             'Name': [],
             'Type': [],
             'Salience': [],
-            'Sentiscore': [],
-            'Sentimag': [],
+            'Score': [],
+            'Magnitude': [],
           }
 
 
@@ -77,9 +77,9 @@ def sample_analyze_entity_sentiment(text_content):
         # Get the aggregate sentiment expressed for this entity in the provided document.
         sentiment = entity.sentiment
         print(u"Entity sentiment score: {}".format(sentiment.score))
-        res['Sentiscore'].append((sentiment.score))
+        res['Score'].append((sentiment.score))
         print(u"Entity sentiment magnitude: {}".format(sentiment.magnitude))
-        res['Sentimag'].append((sentiment.magnitude))
+        res['Magnitude'].append((sentiment.magnitude))
         # Loop over the metadata associated with entity. For many known entities,
         # the metadata is a Wikipedia URL (wikipedia_url) and Knowledge Graph MID (mid).
         # Some entity types may have additional metadata, e.g. ADDRESS entities
@@ -106,7 +106,7 @@ def sample_analyze_entity_sentiment(text_content):
     return df
 
 
-def sample_classify_text(text_content):
+def classify_text(text_content):
     """
     Classifying Content in a String
 
@@ -126,6 +126,12 @@ def sample_classify_text(text_content):
     language = "en"
     document = {"content": text_content, "type_": type_, "language": language}
 
+    res = {
+        'Name': [],
+        'Confindence': [],
+    }
+
+
     response = client.classify_text(request = {'document': document})
     # Loop through classified categories returned from the API
     for category in response.categories:
@@ -135,7 +141,27 @@ def sample_classify_text(text_content):
         print(u"Category name: {} confidence {}".format(category.name,category.confidence ))
         # Get the confidence. Number representing how certain the classifier
         # is that this category represents the provided text.
+        res['Name'].append((category.name))
+        res['Confindence'].append((category.confidence))
 
+    df = pd.DataFrame(res)
+    return df
+
+def analyze_text_sentiment(text):
+    document = language_v1.Document(content=text, type_=language_v1.Document.Type.PLAIN_TEXT)
+
+    res = {
+        'Score': [],
+        'Magnitude': [],
+    }
+
+    # Detects the sentiment of the text
+    sentiment = client.analyze_sentiment(request={'document': document}).document_sentiment
+    print("whole Text Sentiment: {}, magnitude: {}".format(sentiment.score, sentiment.magnitude))
+    res['Score'].append((sentiment.score))
+    res['Magnitude'].append((sentiment.magnitude))
+    df = pd.DataFrame(res)
+    return df
 
 
 if __name__ == '__main__':
@@ -152,14 +178,15 @@ if __name__ == '__main__':
             text = contents
             print(contents)
 
-        document = language_v1.Document(content=text, type_=language_v1.Document.Type.PLAIN_TEXT)
+        dfcategory = classify_text(text)
 
-        # Detects the sentiment of the text
-        sentiment = client.analyze_sentiment(request={'document': document}).document_sentiment
+        dfsenti = analyze_entity_sentiment(text)
 
-        sample_classify_text(text)
-        print("whole Text Sentiment: {}, magnitude: {}".format(sentiment.score, sentiment.magnitude))
+        dftxtsenti= analyze_text_sentiment(text)
 
-        res = sample_analyze_entity_sentiment(text)
-        print(res)
+        with pd.ExcelWriter(arg.outputRes +'.xlsx') as writer:  
+            dfsenti.to_excel(writer, sheet_name='SentimentEntities')
+            dfcategory.to_excel(writer, sheet_name='Category')
+            dftxtsenti.to_excel(writer, sheet_name='SentimentText')
+
 
