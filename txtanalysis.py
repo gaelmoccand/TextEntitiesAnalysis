@@ -41,6 +41,7 @@ def analyze_entity_sentiment(text_content):
         'Salience': [],
         'Score': [],
         'Magnitude': [],
+        'Metadatas': [],
     }
 
     # text_content = 'Grapes are good. Bananas are bad.'
@@ -84,8 +85,13 @@ def analyze_entity_sentiment(text_content):
         # the metadata is a Wikipedia URL (wikipedia_url) and Knowledge Graph MID (mid).
         # Some entity types may have additional metadata, e.g. ADDRESS entities
         # may have metadata for the address street_name, postal_code, et al.
+        metadatas = str()
         for metadata_name, metadata_value in entity.metadata.items():
             print(u"{} = {}".format(metadata_name, metadata_value))
+            metadatas += u" {} = {}".format(metadata_name, metadata_value)
+
+        res['Metadatas'].append(metadatas)
+
 
         # Loop over the mentions of this entity in the input document.
         # The API currently supports proper noun mentions.
