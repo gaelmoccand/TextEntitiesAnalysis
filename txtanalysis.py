@@ -2,29 +2,29 @@
 from pandas.core.indexes.base import ensure_index
 from google.cloud import language_v1
 import sys
+import os
 import pandas as pd
-
+import argparse
 
 
 client = language_v1.LanguageServiceClient()
 
+class ApiNlp:
+    """
+    Class to use google Natural Language API
 
-class ArgParser:
+    Args:
+      inputText The text content to analyze
+    """
 
-    inputTxt = str()
-    outputRes = str()
-    failed = False
-    def __init__(self):
-        if len(sys.argv) == 3:
-            self.outputRes = str(sys.argv.pop()) 
-            self.inputTxt = str(sys.argv.pop())
+    inputText = str()
 
+    def __init__(self, text):
+        if text.size() < 20:
+            print("Text is too short. It must be at least 20 characters")
+            sys.exit()
         else:
-            print("Too few arguments")
-            print("Syntax:")
-            print("use txtanalysis.py  textFileName resultFileName")
-            self.failed = True
-            exit
+            self.inputText = text
 
 
 def analyze_entity_sentiment(text_content):
@@ -36,13 +36,12 @@ def analyze_entity_sentiment(text_content):
     """
 
     res = {
-            'Name': [],
-            'Type': [],
-            'Salience': [],
-            'Score': [],
-            'Magnitude': [],
-          }
-
+        'Name': [],
+        'Type': [],
+        'Salience': [],
+        'Score': [],
+        'Magnitude': [],
+    }
 
     # text_content = 'Grapes are good. Bananas are bad.'
 
@@ -58,7 +57,8 @@ def analyze_entity_sentiment(text_content):
     # Available values: NONE, UTF8, UTF16, UTF32
     encoding_type = language_v1.EncodingType.UTF8
 
-    response = client.analyze_entity_sentiment(request = {'document': document, 'encoding_type': encoding_type})
+    response = client.analyze_entity_sentiment(
+        request={'document': document, 'encoding_type': encoding_type})
 
     print(u"Sentiment Entities:\n")
     # Loop through entitites returned from the API
@@ -92,9 +92,7 @@ def analyze_entity_sentiment(text_content):
         for mention in entity.mentions:
             print(u"Mention text: {}".format(mention.text.content))
             # Get the mention type, e.g. PROPER for proper noun
-            print(
-                u"Mention type: {}".format(language_v1.EntityMention.Type(mention.type_).name)
-            )
+            print(u"Mention type: {}".format(language_v1.EntityMention.Type(mention.type_).name))
 
         print(u"\n")
 
@@ -114,7 +112,6 @@ def classify_text(text_content):
       text_content The text content to analyze. Must include at least 20 words.
     """
 
-
     # text_content = 'That actor on TV makes movies in Hollywood and also stars in a variety of popular new TV shows.'
 
     # Available types: PLAIN_TEXT, HTML
@@ -131,14 +128,14 @@ def classify_text(text_content):
         'Confindence': [],
     }
 
-
-    response = client.classify_text(request = {'document': document})
+    response = client.classify_text(request={'document': document})
     # Loop through classified categories returned from the API
     for category in response.categories:
         # Get the name of the category representing the document.
         # See the predefined taxonomy of categories:
         # https://cloud.google.com/natural-language/docs/categories
-        print(u"Category name: {} confidence {}".format(category.name,category.confidence ))
+        print(u"Category name: {} confidence {}".format(
+            category.name, category.confidence))
         # Get the confidence. Number representing how certain the classifier
         # is that this category represents the provided text.
         res['Name'].append((category.name))
@@ -147,8 +144,10 @@ def classify_text(text_content):
     df = pd.DataFrame(res)
     return df
 
+
 def analyze_text_sentiment(text):
-    document = language_v1.Document(content=text, type_=language_v1.Document.Type.PLAIN_TEXT)
+    document = language_v1.Document(
+        content=text, type_=language_v1.Document.Type.PLAIN_TEXT)
 
     res = {
         'Score': [],
@@ -156,8 +155,10 @@ def analyze_text_sentiment(text):
     }
 
     # Detects the sentiment of the text
-    sentiment = client.analyze_sentiment(request={'document': document}).document_sentiment
-    print("whole Text Sentiment: {}, magnitude: {}".format(sentiment.score, sentiment.magnitude))
+    sentiment = client.analyze_sentiment(
+        request={'document': document}).document_sentiment
+    print("whole Text Sentiment: {}, magnitude: {}".format(
+        sentiment.score, sentiment.magnitude))
     res['Score'].append((sentiment.score))
     res['Magnitude'].append((sentiment.magnitude))
     df = pd.DataFrame(res)
@@ -166,27 +167,33 @@ def analyze_text_sentiment(text):
 
 if __name__ == '__main__':
 
+    parser = argparse.ArgumentParser(description='Analyze Entities and Sentiment from text input file ')
+    parser.add_argument('InputFile', metavar='path', type=str, help='input text file')
+    parser.add_argument('Results', metavar='path', type=str, help='output result .xlsx file')
 
-    arg = ArgParser()
-    if not arg.failed:
+    args = parser.parse_args()
 
-        # The text to analyze
-        text = str()
+    input_path = args.InputFile
+    results_path = args.Results
 
-        with open(arg.inputTxt) as f:
-            contents = f.read()
-            text = contents
-            print(contents)
 
-        dfcategory = classify_text(text)
+    if not os.path.isfile(input_path):
+        print('The input text file specified does not exist')
+        sys.exit()
 
-        dfsenti = analyze_entity_sentiment(text)
 
-        dftxtsenti= analyze_text_sentiment(text)
+    with open(input_path) as file:
+        contents = file.read()
+        in_text = contents
+        print(contents)
 
-        with pd.ExcelWriter(arg.outputRes +'.xlsx') as writer:  
+        dfcategory = classify_text(in_text)
+
+        dfsenti = analyze_entity_sentiment(in_text)
+
+        dftxtsenti = analyze_text_sentiment(in_text)
+
+        with pd.ExcelWriter(results_path + '.xlsx') as writer:
             dfsenti.to_excel(writer, sheet_name='SentimentEntities')
             dfcategory.to_excel(writer, sheet_name='Category')
             dftxtsenti.to_excel(writer, sheet_name='SentimentText')
-
-
