@@ -27,6 +27,6 @@ $ export GOOGLE_APPLICATION_CREDENTIALS="KEY_PATH"
 
 ```shell
 
-$ python3 txtanalysis.py tst.txt results
+$ python3 getEntity.py --lang en input.txt resultFile 
 
 ```
