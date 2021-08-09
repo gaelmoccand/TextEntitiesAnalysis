@@ -11,7 +11,8 @@ class gNlpApi:
     Class to wrap google Natural Language API
 
     Args:
-      inputText The text content to analyze
+        text : the input text read from file to be analyzed. Must include at least 20 char.
+        lang : language english is default [en, de, fr, it]
     """
 
 
@@ -30,10 +31,13 @@ class gNlpApi:
 
     def analyze_entity_sentiment(self):
         """
-        Analyzing Entity Sentiment in a String
+        Analyzing Entity Sentiment in a String or Text
 
         Args:
-        text_content The text content to analyze
+
+        Return:
+            df : Panda Data Frame with the entities analysis
+
         """
 
         res = {
@@ -43,6 +47,7 @@ class gNlpApi:
             'Score': [],
             'Magnitude': [],
             'Metadatas': [],
+            'Mentions': [],
         }
 
         type_ = language_v1.Document.Type.PLAIN_TEXT
@@ -82,17 +87,21 @@ class gNlpApi:
             metadatas = str()
             for metadata_name, metadata_value in entity.metadata.items():
                 print(u"{} = {}".format(metadata_name, metadata_value))
-                metadatas += u" {} = {}".format(metadata_name, metadata_value)
+                metadatas += u" {} = {}; ".format(metadata_name, metadata_value)
 
             res['Metadatas'].append(metadatas)
 
 
             # Loop over the mentions of this entity in the input document.
             # The API currently supports proper noun mentions.
+            mentions = str()
             for mention in entity.mentions:
                 print(u"Mention text: {}".format(mention.text.content))
                 # Get the mention type, e.g. PROPER for proper noun
                 print(u"Mention type: {}".format(language_v1.EntityMention.Type(mention.type_).name))
+                mentions += "{} : {}; ".format(mention.text.content, language_v1.EntityMention.Type(mention.type_).name)
+            res['Mentions'].append(mentions)
+
 
             print(u"\n")
 
@@ -109,8 +118,11 @@ class gNlpApi:
         Classifying Content in a String
 
         Args:
-        text_content The text content to analyze. Must include at least 20 words.
+            none
+        Return:
+            df : Panda Data Frame with the entities analysis
         """
+
 
         type_ = language_v1.Document.Type.PLAIN_TEXT
 
