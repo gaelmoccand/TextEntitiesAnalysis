@@ -55,7 +55,7 @@ class gNlpApi:
         document = {"content": self.input_txt, "type_": type_, "language": self.input_lang}
 
         # Available values: NONE, UTF8, UTF16, UTF32
-        encoding_type = language_v1.EncodingType.UTF8
+        encoding_type = language_v1.EncodingType.UTF32
 
         response = self.client.analyze_entity_sentiment(
             request={'document': document, 'encoding_type': encoding_type})
@@ -111,6 +111,68 @@ class gNlpApi:
         print(u"Language of the text: {}".format(response.language))
         df = pd.DataFrame(res)
         return df
+
+
+    def analyze_entity(self):
+        """
+        Analyzing Entity in a String or Text
+
+        Args:
+
+        Return:
+            df : Panda Data Frame with the entities analysis
+
+        """
+
+        res = {
+            'Name': [],
+            'Type': [],
+            'Salience': [],
+            'Metadatas': [],
+        }
+
+        type_ = language_v1.Document.Type.PLAIN_TEXT
+
+        document = {"content": self.input_txt, "type_": type_, "language": self.input_lang}
+
+        # Available values: NONE, UTF8, UTF16, UTF32
+        encoding_type = language_v1.EncodingType.UTF32
+
+        response = self.client.analyze_entities(
+            request={'document': document, 'encoding_type': encoding_type})
+
+        print(u" Entities:\n")
+        # Loop through entitites returned from the API
+        for entity in response.entities:
+            print(u"Representative name for the entity: {}".format(entity.name))
+            res['Name'].append(format(entity.name))
+            # Get entity type, e.g. PERSON, LOCATION, ADDRESS, NUMBER, et al
+            ent = language_v1.Entity.Type(entity.type_).name
+            print(u"Entity type: {}".format(ent))
+            res['Type'].append(ent)
+
+            # Get the salience score associated with the entity in the [0, 1.0] range
+            print(u"Salience score: {}".format(entity.salience))
+            res['Salience'].append((entity.salience))
+
+            # Loop over the metadata associated with entity. For many known entities,
+            # the metadata is a Wikipedia URL (wikipedia_url) and Knowledge Graph MID (mid).
+            # Some entity types may have additional metadata, e.g. ADDRESS entities
+            # may have metadata for the address street_name, postal_code, et al.
+            metadatas = str()
+            for metadata_name, metadata_value in entity.metadata.items():
+                print(u"{} = {}".format(metadata_name, metadata_value))
+                metadatas += u" {} = {}; ".format(metadata_name, metadata_value)
+
+            res['Metadatas'].append(metadatas)
+
+        # Get the language of the text, which will be the same as
+        # the language specified in the request or, if not specified,
+        # the automatically-detected language.
+        print(u"Language of the text: {}".format(response.language))
+        df = pd.DataFrame(res)
+        return df
+
 
 
     def classify_text(self):
