@@ -34,7 +34,7 @@ if __name__ == '__main__':
         params = {
             'query': query,
             'key': api_key,
-            'limit': 10,
+            'limit': 6,
             'indent': True,
         }
         url = service_url + '?' + urllib.parse.urlencode(params)
@@ -43,7 +43,7 @@ if __name__ == '__main__':
         response = json.loads(r)
         for element in response['itemListElement']:
             print(element['result']['name'] + ' (' + str(element['resultScore']) + ')')
-            print(element['result']['description'])
+            print(element['result'].get('description',""))
             print(element['result']['@type'])
             print(element['result'].get('detailedDescription',""))
             print('\n')
