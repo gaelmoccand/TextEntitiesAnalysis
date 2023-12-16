@@ -5,10 +5,11 @@ This tool will retrieve entities from a text.
 It gives the sentiment analysis score on each entity and on the whole text.
 Additionally, it also provides the corresponding categories for the text.
 A xls file is generated to store all results.
-https://cloud.google.com/sdk/docs/install
-https://cloud.google.com/natural-language/docs/quickstart-client-libraries
-https://cloud.google.com/natural-language/docs/analyzing-entities
-https://cloud.google.com/natural-language/docs/categories
+references:
+- https://cloud.google.com/sdk/docs/install
+- https://cloud.google.com/natural-language/docs/quickstart-client-libraries
+- https://cloud.google.com/natural-language/docs/analyzing-entities
+- https://cloud.google.com/natural-language/docs/categories
 
 # 1 Setup
 
