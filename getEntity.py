@@ -39,7 +39,7 @@ if __name__ == '__main__':
             df_entity = g_nlp.analyze_entity_sentiment()
             df_txt_senti = g_nlp.analyze_text_sentiment()
         else:
-            df_category = None
+            df_category = g_nlp.classify_text()
             df_entity = g_nlp.analyze_entity()
             df_txt_senti = g_nlp.analyze_text_sentiment()
 

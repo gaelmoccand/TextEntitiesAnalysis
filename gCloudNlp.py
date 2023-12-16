@@ -1,6 +1,6 @@
 # Imports the Google Cloud client library
 from pandas.core.indexes.base import ensure_index
-from google.cloud import language_v1
+from google.cloud import language_v2, language_v1
 import sys
 import pandas as pd
 
@@ -24,7 +24,9 @@ class gNlpApi:
         else:
             self.input_txt = text
             self.input_lang = lang
-            self.client = language_v1.LanguageServiceClient()
+            self.client = language_v2.LanguageServiceClient()
+            self.client_v1 = language_v1.LanguageServiceClient()
+
 
 
 
@@ -57,7 +59,7 @@ class gNlpApi:
         # Available values: NONE, UTF8, UTF16, UTF32
         encoding_type = language_v1.EncodingType.UTF32
 
-        response = self.client.analyze_entity_sentiment(
+        response = self.client_v1.analyze_entity_sentiment(
             request={'document': document, 'encoding_type': encoding_type})
 
         print(u"Sentiment Entities:\n")
@@ -98,8 +100,8 @@ class gNlpApi:
             for mention in entity.mentions:
                 print(u"Mention text: {}".format(mention.text.content))
                 # Get the mention type, e.g. PROPER for proper noun
-                print(u"Mention type: {}".format(language_v1.EntityMention.Type(mention.type_).name))
-                mentions += "{} : {}; ".format(mention.text.content, language_v1.EntityMention.Type(mention.type_).name)
+                print(u"Mention type: {}".format(language_v2.EntityMention.Type(mention.type_).name))
+                mentions += "{} : {}; ".format(mention.text.content, language_v2.EntityMention.Type(mention.type_).name)
             res['Mentions'].append(mentions)
 
 
@@ -138,7 +140,7 @@ class gNlpApi:
         # Available values: NONE, UTF8, UTF16, UTF32
         encoding_type = language_v1.EncodingType.UTF32
 
-        response = self.client.analyze_entities(
+        response = self.client_v1.analyze_entities(
             request={'document': document, 'encoding_type': encoding_type})
 
         print(u" Entities:\n")
@@ -195,7 +197,17 @@ class gNlpApi:
             'Confindence': [],
         }
 
-        response = self.client.classify_text(request={'document': document})
+        content_categories_version = (
+            language_v1.ClassificationModelOptions.V2Model.ContentCategoriesVersion.V2
+        )
+        response = self.client_v1.classify_text(
+            request={
+                "document": document,
+                "classification_model_options": {
+                    "v2_model": {"content_categories_version": content_categories_version}
+                },
+            }
+        )
         # Loop through classified categories returned from the API
         for category in response.categories:
             # Get the name of the category representing the document.
@@ -212,8 +224,8 @@ class gNlpApi:
 
 
     def analyze_text_sentiment(self):
-        document = language_v1.Document(
-            content=self.input_txt, type_=language_v1.Document.Type.PLAIN_TEXT)
+        document = language_v2.Document(
+            content=self.input_txt, type_=language_v2.Document.Type.PLAIN_TEXT)
 
         res = {
             'Score': [],

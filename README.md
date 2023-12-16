@@ -3,10 +3,12 @@
 Using Google Natural Language AI. 
 This tool will retrieve entities from a text.
 It gives the sentiment analysis score on each entity and on the whole text.
-Additionally, it also provide the corresponding categories for the text.
-An xls file is genereated to store all results.
-
+Additionally, it also provides the corresponding categories for the text.
+A xls file is generated to store all results.
+https://cloud.google.com/sdk/docs/install
 https://cloud.google.com/natural-language/docs/quickstart-client-libraries
+https://cloud.google.com/natural-language/docs/analyzing-entities
+https://cloud.google.com/natural-language/docs/categories
 
 # 1 Setup
 
@@ -22,9 +24,18 @@ $ source env/bin/activate
 
 ```shell
 $ python3 -m pip install -r requirements.txt
-$ export GOOGLE_APPLICATION_CREDENTIALS="KEY_PATH"
 
 ```
+
+## 1.3 cloud sdk
+
+```shell
+$ gcloud init (if not run automatically then select your project)
+$ gcloud services enable language.googleapis.com
+$ gcloud auth application-default login
+
+```
+
 
 # 2 Usage
 
