@@ -31,6 +31,7 @@ $ python3 -m pip install -r requirements.txt
 
 
 - download gcloud CLI and install it from https://cloud.google.com/sdk/docs/install
+- create a project in your google cloud (https://cloud.google.com/resource-manager/docs/creating-managing-projects)
 ```shell
 $ gcloud init (if not run automatically then select your project)
 $ gcloud services enable language.googleapis.com
