@@ -1,4 +1,10 @@
 pandas
 numpy
 XlsxWriter
+urllib
+sys
+json
 google-cloud-language
+google-api-python-client
+
+AIzaSyD8bpmFeA9ZLWwbgT24yCPROpEjw2ZX-RA
