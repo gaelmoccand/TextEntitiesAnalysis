@@ -6,7 +6,6 @@ It gives the sentiment analysis score on each entity and on the whole text.
 Additionally, it also provides the corresponding categories for the text.
 A xls file is generated to store all results.
 references:
-- https://cloud.google.com/sdk/docs/install
 - https://cloud.google.com/natural-language/docs/quickstart-client-libraries
 - https://cloud.google.com/natural-language/docs/analyzing-entities
 - https://cloud.google.com/natural-language/docs/categories
@@ -25,11 +24,13 @@ $ source env/bin/activate
 
 ```shell
 $ python3 -m pip install -r requirements.txt
-
 ```
 
-## 1.3 cloud sdk
 
+## 1.4 cloud sdk
+
+
+- download gcloud CLI and install it from https://cloud.google.com/sdk/docs/install
 ```shell
 $ gcloud init (if not run automatically then select your project)
 $ gcloud services enable language.googleapis.com
