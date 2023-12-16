@@ -17,7 +17,7 @@ class ArgParser:
         else:
             print("Too few arguments")
             print("Syntax:")
-            print("use python knowGraphSearch.py  \"your input\" ")
+            print("use python searchEntity.py  \"your input\" ")
             self.failed = True
             exit
 
@@ -26,8 +26,8 @@ if __name__ == '__main__':
 
     arg = ArgParser()
     if not arg.failed:
-        api_key = open('.api_key').read()
-        #api_key = "zaSyBF7-v2wncy98ARIZNM7_CGrTwUfCiVs4c"
+        #api_key = open('.api_key').read()
+        api_key = "AIzaSyBF7-v2wncy98ARIZNM7_CGrTwUfCiVs4c"
         print(api_key)
         query = arg.input_txt
         service_url = 'https://kgsearch.googleapis.com/v1/entities:search'

@@ -27,7 +27,7 @@ $ python3 -m pip install -r requirements.txt
 ```
 
 
-## 1.4 cloud sdk
+## 1.4 cloud sdk (only for Entity Analysis )
 
 
 - download gcloud CLI and install it from https://cloud.google.com/sdk/docs/install
@@ -40,9 +40,19 @@ $ gcloud auth application-default login
 ```
 
 
-# 2 Usage
+## 1.4 set api key (for searchEntity only)
+
+- save api key in .api_key file 
+
+# 2 Usage Entity Analysis
 
 ```shell
 $ python3 getEntity.py --lang en inputTextFile resultsXlsFile
+
+```
+
+# 3 Usage Entity Search
+```shell
+$ python3 searchEntity.py "Tesla"
 
 ```
